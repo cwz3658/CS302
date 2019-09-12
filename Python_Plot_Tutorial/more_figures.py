@@ -45,7 +45,7 @@ ax2.set_ylabel('Median Salary')
 # x2.set_title('Median Salary (USD) by Age')
 # plt.grid(True)
 plt.tight_layout()
-plt.show()
+plt.show() # 
 
 # save figure
 fig1.savefig('fig1.png')

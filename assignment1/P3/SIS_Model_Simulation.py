@@ -15,10 +15,10 @@ plt.style.use('seaborn')
 N = 100
 gamma =  0.25
 
-fig1, axes1 = plt.subplots(nrows=2, ncols=3, sharex=True)
+fig1, axes1 = plt.subplots(nrows=3, ncols=3, sharex=True)
 fig1.set_size_inches(18.5, 10.5)
 
-for beta, row in zip([0.03, 0.06, 0.1], range(0, 2)):
+for beta, row in zip([0.03, 0.06, 0.1], range(0, 3)):
     for h, col in zip([0.01, 0.5, 2.0], range(0, 3)):
         # the differential equation for I 
         I_dot = lambda t, I: beta*(N - I)*I - gamma*I
@@ -44,4 +44,5 @@ for beta, row in zip([0.03, 0.06, 0.1], range(0, 2)):
         ax.set_title('beta = {}, h = {}'.format(beta, h))
         ax.legend(loc='lower right')
 
+plt.tight_layout()
 fig1.savefig('p4_figure.png')

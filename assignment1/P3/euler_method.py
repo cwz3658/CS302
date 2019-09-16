@@ -23,7 +23,7 @@ def euler_method(y_dot, initial_condition, a, b, h):
     y_list = [initial_condition]
     
     # compute y value inductiively
-    while t <= b:
+    while t < b:
         y = y + y_dot(t, y)*h  # compute next y value using the current y value
         y_list.append(y)
         t = t + h

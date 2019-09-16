@@ -15,7 +15,7 @@ plt.style.use('seaborn')
 N = 100
 gamma =  0.25
 
-fig1, axes1 = plt.subplots(nrows=3, ncols=3, sharex=True)
+fig1, axes1 = plt.subplots(nrows=3, ncols=3, sharex=False)
 fig1.set_size_inches(18.5, 10.5)
 
 for beta, row in zip([0.03, 0.06, 0.1], range(0, 3)):
@@ -26,7 +26,7 @@ for beta, row in zip([0.03, 0.06, 0.1], range(0, 3)):
         # set parameters
         I_initial = 10
         a = 0
-        b = 50
+        b = 50 * h
         
         # run integrator and collect data
         t_list_euler, I_list_euler = euler_method(I_dot, I_initial, a, b, h)
@@ -41,7 +41,7 @@ for beta, row in zip([0.03, 0.06, 0.1], range(0, 3)):
                 label='heun method')
         ax.set_xlabel('time')
         ax.set_ylabel('number of infectious')
-        ax.set_title('beta = {}, h = {}'.format(beta, h))
+        ax.set_title('beta = {}, h = {}'.format(beta, h), loc='right')
         ax.legend(loc='lower right')
 
 plt.tight_layout()

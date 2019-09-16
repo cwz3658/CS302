@@ -23,7 +23,7 @@ def heun_method(y_dot, initial_condition, a, b, h):
     y_list = [initial_condition]
     
     # compute y value inductiively
-    while t <= b:
+    while t < b:
         y_pre = y + h * y_dot(t, y)
         y = y + (h/2)*(y_dot(t, y) + y_dot(t + h, y_pre))
         t = t + h

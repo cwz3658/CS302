@@ -3,7 +3,6 @@
 """
 Created on Wed Sep 11 12:08:44 2019
 
-@author: zhangyan
 """
 
 

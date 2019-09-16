@@ -3,7 +3,6 @@
 """
 Created on Wed Sep 11 11:56:04 2019
 
-@author: zhangyan
 """
 from euler_method import *
 from heun_method import *

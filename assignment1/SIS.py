@@ -8,7 +8,6 @@ Created on Mon Sep 16 11:58:19 2019
 from pylab import *
 
 
-
     
 def initialize():
     global S, I, Sresult, Iresult
@@ -18,11 +17,11 @@ def initialize():
     Iresult=[I]
 
 def euler(f,y0,t0,te,h):
-	t = t0
+    t = t0
     timestep = [t]
     y = y0
     yresult = [y]
-	while t < te:
+    while t < te:
          y = y+h * f(t,y)
          t = t+h
          yresult.append(y)

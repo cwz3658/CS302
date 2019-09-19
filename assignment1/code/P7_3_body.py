@@ -3,7 +3,6 @@
 """
 Created on Wed Sep 18 15:28:17 2019
 
-@author: zhangyan
 """
 
 import scipy as sci

@@ -9,7 +9,7 @@ Created on Wed Sep 18 15:28:17 2019
 import scipy as sci
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import animation 
+import numpy as np
 
 # define constants and reference quantities 
 G = 6.67408e-11 
@@ -33,12 +33,12 @@ m2 = 0.907
 m3 = 1.0 
 
 # define initial position vectors
-r1 = np.array([-0.5, 0, 0])
-r2 = np.array([0.5, 0, 0])
-r3 = np.array([0, 1, 0])
+r1 = np.array([1, 0, 0])
+r2 = np.array([0, 1, 0])
+r3 = np.array([0, 0, 1])
 
 # define initial velocities
-v1 = np.array([0.01, 0.01, 0]) 
+v1 = np.array([0.01, 0.01, 0.001]) 
 v2 = np.array([-0.05, 0, -0.1])
 v3 = np.array([0, -0.01, 0])
 
@@ -95,5 +95,6 @@ ax.plot(r3_sol[:,0],r3_sol[:,1],r3_sol[:,2],color="yellow", label = 'm3')
 ax.set_xlabel("x-coordinate",fontsize=14)
 ax.set_ylabel("y-coordinate",fontsize=14)
 ax.set_zlabel("z-coordinate",fontsize=14)
-ax.set_title("Visualization of orbits of stars in a three-body system\n",fontsize=14)
+ax.set_title("Orbits of suns in a three-body system\n r1 = {} \n r2 = {} \n r3 = {} \n v1 = {}, \n v2 = {} \n v3 = {} ".format(r1, r2, r3, v1, v2, v3),fontsize=14)
 ax.legend(loc="upper left",fontsize=14)
+plt.tight_layout()

@@ -11,6 +11,7 @@ import numpy as np
 from numpy import linalg as LA
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from heun_method import *
 
 def three_body_model(t, y):
     """
@@ -64,11 +65,8 @@ end_time = 10*365.26*24*3600 # simulate for 10 years
 h = 2 * 3600 # step size is two days
 
 
-soln = solve_ivp(three_body_model, [0, end_time], y0, max_step = 10)
+t, y = heun_method(three_body_model, y0, 0, end_time, 1)
 
-# extract the position information
-y = soln.y
-t = soln.t
 # 3-D plot
 fig = plt.figure(figsize = (10, 10))
 ax = fig.gca(projection='3d')

@@ -9,3 +9,4 @@ def greed():
 
 greed()
 
+print(greed)

@@ -3,6 +3,8 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 from matplotlib.animation import ArtistAnimation
+import itertools
+import random
 
 
 class TrafficFlowCA:
@@ -58,40 +60,88 @@ class TrafficFlowCA:
             self.config_history.append(next_config)
 
 
-def sim_driver(lane_num, L, num_cars, sim_time):
-    pass
+def sim_driver_show(lane_num, L, num_cars, sim_time):
+    """
+    display a simulation
+    """
+    # setup a simulation
+    rows = range(lane_num)
+    cols = range(L)
+    all_positions = list(itertools.product(rows, cols))
+
+    cars_init_speed_vec = np.random.randint(0, 3, size=num_cars)
+    cars_maxspeed_vec = np.random.randint(3, 6, size=num_cars)
+    cars_initial_pos_vec = random.sample(all_positions, num_cars)
+    prob_change_lane_vec = np.random.random(num_cars)
+    prob_decrease_speed_vec = np.random.random(num_cars)
+
+    t_ca = TrafficFlowCA(
+        lane_num,
+        L,
+        num_cars,
+        cars_init_speed_vec,
+        cars_maxspeed_vec,
+        cars_initial_pos_vec,
+        prob_change_lane_vec,
+        prob_decrease_speed_vec,
+        sim_time,
+    )
+
+    t_ca.run_sim()
+    fig = plt.figure()
+    artists = []
+    for config in t_ca.config_history:
+        plot = plt.imshow(config)
+        artists.append([plot])
+
+    anima = ArtistAnimation(fig, artists, interval=500, repeat=False)
+    plt.show()
 
 
-lane_num = 4
-L = 20
-num_cars = 6
-cars_init_speed_vec = num_cars * [1]
-cars_maxspeed_vec = num_cars * [3]
-cars_initial_pos_vec = [(0, 1), (1, 1), (0, 2), (1, 2), (0, 0), (1, 5)]
-prob_change_lane_vec = num_cars * [0.5]
-prob_decrease_speed_vec = num_cars * [0.2]
-sim_time = 100
+def get_traffic_flow(t_ca, lane_num, L, sim_time):
+    car_list = t_ca.car_list
 
-t_ca = TrafficFlowCA(
-    lane_num,
-    L,
-    num_cars,
-    cars_init_speed_vec,
-    cars_maxspeed_vec,
-    cars_initial_pos_vec,
-    prob_change_lane_vec,
-    prob_decrease_speed_vec,
-    sim_time,
-)
+    # compute total speed during this simulation
+    total_speed = 0
+    for car in car_list:
+        total_speed = total_speed + np.sum(car.speed_history)
 
-t_ca.run_sim()
-
-fig = plt.figure()
-artists = []
-for config in t_ca.config_history:
-    plot = plt.imshow(config)
-    artists.append([plot])
+    tf_flow = total_speed / (sim_time * lane_num * L)
+    return tf_flow
 
 
-anima = ArtistAnimation(fig, artists, interval=500, repeat=False)
-plt.show()
+def sim_driver_traffic_flow(lane_num, L, num_cars, sim_time):
+    """
+    return the traffic flow for this simulation
+    """
+    # setup a simulation
+    rows = range(lane_num)
+    cols = range(L)
+    all_positions = list(itertools.product(rows, cols))
+
+    cars_init_speed_vec = np.random.randint(0, 3, size=num_cars)
+    cars_maxspeed_vec = np.random.randint(3, 6, size=num_cars)
+    cars_initial_pos_vec = random.sample(all_positions, num_cars)
+    prob_change_lane_vec = np.random.random(num_cars)
+    prob_decrease_speed_vec = np.random.random(num_cars)
+
+    t_ca = TrafficFlowCA(
+        lane_num,
+        L,
+        num_cars,
+        cars_init_speed_vec,
+        cars_maxspeed_vec,
+        cars_initial_pos_vec,
+        prob_change_lane_vec,
+        prob_decrease_speed_vec,
+        sim_time,
+    )
+
+    t_ca.run_sim()
+
+    return get_traffic_flow(t_ca, lane_num, L, sim_time)
+
+
+# print(sim_driver_traffic_flow(3, 50, 150, 100))
+
+sim_driver_show(3, 50, 40, 100)

@@ -14,9 +14,9 @@ class TrafficFlowCA:
 
     def __init__(
         self,
-        lane_num,
-        L,
-        num_cars,
+        lane_num: int,
+        L: int,
+        num_cars: int,
         cars_init_speed_vec,
         cars_maxspeed_vec,
         cars_initial_pos_vec,

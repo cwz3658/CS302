@@ -91,10 +91,10 @@ def sim_driver_show(lane_num, L, num_cars, sim_time):
     fig = plt.figure()
     artists = []
     for config in t_ca.config_history:
-        plot = plt.imshow(config)
+        plot = plt.imshow(config, aspect="auto")
         artists.append([plot])
 
-    anima = ArtistAnimation(fig, artists, interval=500, repeat=False)
+    anima = ArtistAnimation(fig, artists, interval=300, repeat=False)
     plt.show()
 
 
@@ -144,4 +144,4 @@ def sim_driver_traffic_flow(lane_num, L, num_cars, sim_time):
 
 # print(sim_driver_traffic_flow(3, 50, 150, 100))
 
-sim_driver_show(3, 50, 40, 100)
+sim_driver_show(10, 400, 1000, 100)

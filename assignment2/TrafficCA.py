@@ -58,7 +58,11 @@ class TrafficFlowCA:
             self.config_history.append(next_config)
 
 
-lane_num = 3
+def sim_driver(lane_num, L, num_cars, sim_time):
+    pass
+
+
+lane_num = 4
 L = 20
 num_cars = 6
 cars_init_speed_vec = num_cars * [1]
@@ -83,11 +87,11 @@ t_ca = TrafficFlowCA(
 t_ca.run_sim()
 
 fig = plt.figure()
-pop = []
+artists = []
 for config in t_ca.config_history:
     plot = plt.imshow(config)
-    pop.append([plot])
+    artists.append([plot])
 
 
-anima = ArtistAnimation(fig, pop, interval=200)
+anima = ArtistAnimation(fig, artists, interval=500, repeat=False)
 plt.show()

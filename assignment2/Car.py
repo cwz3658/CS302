@@ -5,6 +5,11 @@ class Car:
     def __init__(
         self, speed, max_speed, position, prob_change_lane, prob_decrease_speed
     ):
+        """
+        speed, max_speed: int
+        position: tupple
+        prob_change_lane, prob_decrease_speed: float
+        """
         self.speed = speed
         self.max_speed = max_speed
         self.position = position  # represent by a tupple

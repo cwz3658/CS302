@@ -77,7 +77,7 @@ def grow_plot(data1x,data1y,data2x,data2y):
     return
 
 #find dimention
-def find_dimention(x,y):
+def find_dimension(x,y):
     Number=[]
     Epsilon=[]
     for epsilon_n in range(2,grid):
@@ -103,5 +103,5 @@ while len(origin_x)<Size:
 
 grow_plot(origin_x,origin_y,particles_x,particles_y)
 
-dimention,interception=find_dimention(origin_x,origin_y)
-print(dimention)
+dimension,interception=find_dimension(origin_x,origin_y)
+print(dimension)

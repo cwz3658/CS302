@@ -1,19 +1,26 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+Created on Thu Oct  3 11:07:52 2019
+
+@author: chen
+"""
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
 Created on Wed Oct  2 17:43:51 2019
 
 @author: chen
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.animation import ArtistAnimation
-
+from scipy.stats import linregress
 
 global N, grid
-N=30
-#attraction=0.8
-grid=100
+N=200      #random walker amount
+grid=100   #grid size
+Size=300   #size of the root
 
 #initial pints
 origin_x=np.array([grid/2])
@@ -66,18 +73,35 @@ def grow_plot(data1x,data1y,data2x,data2y):
     plt.legend(loc=2)
     plt.xlim(0,grid)
     plt.ylim(0,grid)
-    return fig
+    plt.show()  
+    return
+
+#find dimention
+def find_dimension(x,y):
+    Number=[]
+    Epsilon=[]
+    for epsilon_n in range(2,grid):
+        H, xedges, yedges=np.histogram2d(x,y,bins=np.arange(0,grid+grid/epsilon_n,grid/epsilon_n))
+        N_e=np.count_nonzero(H)
+        Number=np.append(Number,N_e)
+        Epsilon=np.append(Epsilon,grid/epsilon_n)    
+    plt.figure()
+    plt.loglog(Epsilon, Number)
+    plot_x=np.log(Epsilon)
+    plot_y=np.log(Number)
+    slope, intercept, r_value, p_value, std_err = linregress(plot_x,plot_y)
+    return slope,intercept
+
 
 #in each step, run a random walk and checking around
 pop=[]
 particles_x=np.random.randint(grid,size=N)
 particles_y=np.random.randint(grid,size=N)
-for i in range(10):
+while len(origin_x)<Size:
     particles_x,particles_y=random_walk(particles_x,particles_y)
     origin_x,origin_y,particles_x,particles_y=neighbor_particle(origin_x,origin_y,particles_x,particles_y)
-    plot=grow_plot(origin_x,origin_y,particles_x,particles_y)
-    pop.append([plot])
 
-anima=ArtistAnimation(plt.gcf(), pop ,interval=200)
-plt.show()  
+grow_plot(origin_x,origin_y,particles_x,particles_y)
 
+dimension,interception=find_dimension(origin_x,origin_y)
+print(dimension)

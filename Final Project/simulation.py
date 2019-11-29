@@ -6,18 +6,18 @@ from wall import Wall
 import scipy as sci
 import pygame
 
-# def init():
-#     """
-#     init() function serves to setup the plot for animating:
-#         1. create the first frame to display
-#     """
-#     for c in circle_list:
-#         ax.add_patch(c)
-#     # add door representation
-#     p_lower = (wall.door_pos[0][0] - 0.1, wall.door_pos[0][1])  # door thickness = 10cm
-#     rectangle = plt.Rectangle(p_lower, 0.1, wall.door_width)
-#     ax.add_patch(rectangle)
-#     return circle_list
+def init():
+    """
+    init() function serves to setup the plot for animating:
+        1. create the first frame to display
+    """
+    for c in circle_list:
+        ax.add_patch(c)
+    # add door representation
+    p_lower = (wall.door_pos[0][0] - 0.1, wall.door_pos[0][1])  # door thickness = 10cm
+    rectangle = plt.Rectangle(p_lower, 0.1, wall.door_width)
+    ax.add_patch(rectangle)
+    return circle_list
 
 
 def animate(i):
@@ -40,11 +40,11 @@ def animate(i):
         F_from_wall = p.F_from_wall(wall)
 
         Fi = F_from_self + F_from_others + F_from_wall
-        print(p.vec_r)
+        print(Fi)
         dt = 0.05
         p.move(Fi, dt)
-    for p in p_list:
-        pygame.draw.circle(screen, (0, 0, 0), (np.int(p.vec_r[0]*20),np.int(p.vec_r[1]*20)), np.int(p.r_i*20), 1)
+
+    return circle_list
 
 
 # # Setting blit=True ensures that only the portions of the image which have changed are updated.
@@ -75,14 +75,14 @@ screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption('Escape Panic')
 
 # create a bunch of particles
-num_people = 10
+num_people = 1
 
 vec_v = np.array([0, 0])
 # vec_v = np.random.choice([1, -1]) * np.random.rand(2)
 r = 0.25  # in meters
 
 p_list = [People(np.random.rand(2) * 10, vec_v, r,screen) for i in range(num_people)]
-circle_list = [p.draw() for p in p_list]
+circle_list = [p.circle(screen) for p in p_list]
 # add all circles to ax
 
 # create a wall
@@ -90,6 +90,13 @@ b = 19
 wall_width = 2  # in meters
 wall = Wall(b, wall_width)
 
+
+
+
+
+
+
+P=init()
 i=0
 running = True
 while running:
@@ -98,6 +105,7 @@ while running:
             running = False
     i+=1
     screen.fill(background_colour)
-    animate(i)
+    # animate(i)
     # pygame.draw.lines(screen,(0, 0, 0),0,[(550,310),(550,590),(5,590),(5,5),(550,5),(550,290)],10)
+    
     pygame.display.flip()

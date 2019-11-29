@@ -121,6 +121,6 @@ class People:
 
         return vec_F_iW
 
-    def draw(self):
+    def draw(self,screen):
         # """return its current circle representation"""
         return self.circle

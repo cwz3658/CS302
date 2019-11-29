@@ -20,7 +20,7 @@ import pygame
 #     return circle_list
 
 
-def animate(i):
+def animate(i,screen):
     """
     the task of animate function is to:
         1. create a new frame
@@ -44,7 +44,7 @@ def animate(i):
         dt = 0.05
         p.move(Fi, dt)
     for p in p_list:
-        pygame.draw.circle(screen, (0, 0, 0), (np.int(p.vec_r[0]*20),np.int(p.vec_r[1]*20)), np.int(p.r_i*20), 1)
+        p.draw(screen)
 
 
 # # Setting blit=True ensures that only the portions of the image which have changed are updated.
@@ -78,11 +78,10 @@ pygame.display.set_caption('Escape Panic')
 num_people = 10
 
 vec_v = np.array([0, 0])
-# vec_v = np.random.choice([1, -1]) * np.random.rand(2)
 r = 0.25  # in meters
 
 p_list = [People(np.random.rand(2) * 10, vec_v, r,screen) for i in range(num_people)]
-circle_list = [p.draw() for p in p_list]
+# circle_list = [p.draw() for p in p_list]
 # add all circles to ax
 
 # create a wall
@@ -98,6 +97,6 @@ while running:
             running = False
     i+=1
     screen.fill(background_colour)
-    animate(i)
+    animate(i,screen)
     # pygame.draw.lines(screen,(0, 0, 0),0,[(550,310),(550,590),(5,590),(5,5),(550,5),(550,290)],10)
     pygame.display.flip()

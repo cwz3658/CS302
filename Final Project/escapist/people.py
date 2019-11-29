@@ -38,13 +38,13 @@ class People:
         self.m = self.SD * (
             np.pi * r_i ** 2
         )  # here self.SD access to a class attribute
-        self.thickness = 1
+        # self.thickness = 1
         # the following 2 attributes are for visualizing
         # default circle styles
         # self.styles = {"edgecolor": "b", "fill": True}
-        self.colour = (0, 0, 0)
+        # self.colour = (0, 0, 0)
         # create a circle representation of itself
-        self.circle=pygame.draw.circle(screen, self.colour, (np.int(self.vec_r[0]),np.int(self.vec_r[1])), np.int(self.r_i*100), self.thickness)
+        # self.circle=pygame.draw.circle(screen, self.colour, (np.int(self.vec_r[0]),np.int(self.vec_r[1])), np.int(self.r_i*100), self.thickness)
 
 
     # define a class attribute
@@ -71,7 +71,7 @@ class People:
         self.vec_v = solution[1, 0:2]
         self.vec_r = solution[1, 2:4]
         # update its circle representation
-        self.circle.center = (self.vec_r[0], self.vec_r[1])
+        # self.circle.center = (self.vec_r[0], self.vec_r[1])
 
     def _F_from_self(self, vec_ei):
         """
@@ -121,6 +121,12 @@ class People:
 
         return vec_F_iW
 
-    def draw(self):
+    # def draw(self):
         # """return its current circle representation"""
-        return self.circle
+        # return self.circle
+        
+    def draw(self,screen):
+        self.thickness = 1
+        self.colour = (0, 0, 0)
+        dpi=20 # set resolution
+        pygame.draw.circle(screen, self.colour, (np.int(self.vec_r[0]*dpi),np.int(self.vec_r[1]*dpi)), np.int(self.r_i*dpi), self.thickness)

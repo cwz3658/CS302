@@ -27,7 +27,7 @@ class People:
         [0, x]
     )  # this is a class attribute, a helper function to compute forces
 
-    def __init__(self, vec_r, vec_v, vec_ei, r_i, p_i=0.4, Rv=5):
+    def __init__(self, vec_r, vec_v, vec_ei, r_i, p_i=0.5, Rv=5):
         """
         all vectors are assumed to be np.array(...)
         vec_r: position 2-vector
@@ -65,7 +65,7 @@ class People:
         y_dot = np.array([vec_Fi[0] / self.m, vec_Fi[1] / self.m, vec_Vi[0], vec_Vi[1]])
         return y_dot
 
-    def move(self, vec_Fi, dt):
+    def move(self, vec_Fi, dt, room_width, room_length):
         """
         dt is the time step in seconds
         """
@@ -76,12 +76,25 @@ class People:
         )
 
         # update states
-        self.vec_v = solution[1, 0:2]
-        self.vec_r = solution[1, 2:4]
-        # update its circle representation
-        self.circle.center = (self.vec_r[0], self.vec_r[1])
+        new_vec_v = solution[1, 0:2]
+        new_vec_r = solution[1, 2:4]
 
-    def _F_from_self(self):
+        # if new_vec_v is too large, i.e. shit happens
+        #    keep the vec_v within range! therefore shit does not happen
+        if norm(new_vec_v) > self.v_des:
+            new_vec_v = new_vec_v / norm(new_vec_v) * self.v_des
+
+        if 0 < new_vec_r[0] < room_width and 0 < new_vec_r[1] < room_length:
+            self.vec_v = new_vec_v
+            self.vec_r = new_vec_r
+            # update its circle representation
+            self.circle.center = (self.vec_r[0], self.vec_r[1])
+        else:  # if run out of room, change its velocity to opposite direction
+            self.vec_v = -new_vec_v
+            # update its circle representation
+            self.circle.center = (self.vec_r[0], self.vec_r[1])
+
+    def F_from_self(self):
         """
         Compute the force from v_des
         vec_ei: desired direction
@@ -106,13 +119,24 @@ class People:
         ) * vec_n_ij + self.kappa * People.g(r_ij - d_ij) * delta_v_ji * vec_t_ij
         return vec_F_ij
 
-    def F_from_wall(self, wall):
+    def F_from_wall(self, wall, which_wall):
         """
         Compute force from wall
+        which_all = 'up', 'down', 'left', or 'right'
         """
+        if which_wall == "right":
+            d_iW = norm(wall.b - self.vec_r[0])  # this computes the distance
+            vec_n_iW = np.array([-1, 0])
+        elif which_wall == "left":
+            d_iW = norm(self.vec_r[0] - wall.b)  # this computes the distance
+            vec_n_iW = np.array([1, 0])
+        elif which_wall == "up":
+            d_iW = norm(wall.b - self.vec_r[1])  # this computes the distance
+            vec_n_iW = np.array([0, -1])
+        elif which_wall == "down":
+            d_iW = norm(self.vec_r[0] - wall.b)  # this computes the distance
+            vec_n_iW = np.array([0, 1])
 
-        d_iW = norm(wall.b - self.vec_r[0])  # this computes the distance
-        vec_n_iW = (self.vec_r - np.array([wall.b, self.vec_r[1]])) / d_iW
         vec_t_iW = np.array([-vec_n_iW[1], vec_n_iW[0]])
 
         vec_F_iW = (
@@ -134,11 +158,27 @@ class People:
         """return its current circle representation"""
         return self.circle
 
+    def overlap(self, other):
+        """
+        Detect overlap
+        if this people is overlap with other, return true
+        """
+        r_ij = self.r_i + other.r_i
+        d_ij = norm(self.vec_r - other.vec_r)
+        return d_ij < r_ij
+
     def get_pos(self):
         """
         return the position of this people
         """
         return self.vec_r
+
+    def reach_door(self, door_pos):
+        """
+        returns true if reach door
+        """
+        dist_to_door = norm(door_pos - self.vec_r)
+        return dist_to_door <= 1
 
     def look_around(self, all_people_list):
         """
@@ -169,7 +209,6 @@ class People:
         people_nearby = self.look_around(all_people_list)
         if len(people_nearby) != 0:
             # compute average ei, i.e. <ei>
-            print("I am following")
             ei_list = [p.vec_ei for p in people_nearby]
             avg_ei = np.mean(ei_list, axis=0)
             new_direction = (1 - self.p_i) * self.vec_ei + self.p_i * avg_ei
@@ -187,24 +226,20 @@ class People:
         dist_to_up_wall = room_length - self.vec_r[1]
         if dist_to_up_wall <= self.Rv:  # sees the upwall
             self.vec_ei = random.choice([lower_left, lower_right])
-            print("sees up wall")
             return
 
         dist_to_down_wall = self.vec_r[1]
         if dist_to_down_wall <= self.Rv:
             self.vec_ei = random.choice([up_left, up_right])
-            print("sees down wall")
             return
 
         dist_to_left_wall = self.vec_r[0]
         if dist_to_left_wall <= self.Rv:
             self.vec_ei = random.choice([lower_right, up_right])
-            print("sees left wall")
             return
 
         dist_to_right_wall = room_width - self.vec_r[0]
         if dist_to_right_wall <= self.Rv:
             self.vec_ei = random.choice([lower_left, up_left])
-            print("sees right wall")
             return
 

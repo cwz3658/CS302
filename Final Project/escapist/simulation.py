@@ -85,7 +85,7 @@ p_list = [People(np.random.rand(2) * 10, vec_v, r,screen) for i in range(num_peo
 # add all circles to ax
 
 # create a wall
-b = 19
+b = 12
 wall_width = 2  # in meters
 wall = Wall(b, wall_width)
 

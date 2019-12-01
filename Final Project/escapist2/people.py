@@ -21,7 +21,7 @@ class People:
     k = 1.2e5
     kappa = 2.4e5
     tau = 0.5  # characteristic time
-    v_des = 2  # desired speed
+    v_des = 3.5  # desired speed
 
     g = lambda x: np.max(
         [0, x]

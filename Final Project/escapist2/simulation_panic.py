@@ -20,7 +20,9 @@ ax = plt.axes(
 )  # also add the axes to the current figure and make it the current axes
 
 # create people without overlap
-def create_people(n, room_width, room_length, door_pos, percent_p_at_loss=0.5):
+def create_people(
+    n, room_width, room_length, door_pos, p_i_range, Rv_range, percent_p_at_loss=1
+):
     """
     1.create n people in the room without overlapping
     2.also returns the circle_list, which is the representations of people
@@ -58,9 +60,16 @@ def create_people(n, room_width, room_length, door_pos, percent_p_at_loss=0.5):
     # begin to create our people list
     people_list = []
     while len(people_list) < n:
-        if random.random() < percent_p_at_loss:  # 50% people run randomly
+        if (
+            random.random() < percent_p_at_loss
+        ):  # percent_p_at_loss% people run randomly
             new_p = People(
-                random_pos(), random_velocity(1), random_unit_vector(), random_r_i()
+                random_pos(),
+                random_velocity(1),
+                random_unit_vector(),
+                random_r_i(),
+                random.uniform(p_i_range[0], p_i_range[1]),
+                random.uniform(Rv_range[0], Rv_range[1]),
             )
         else:  # remaining people know the direction
             new_p = People(
@@ -88,39 +97,32 @@ wall_left = Wall(0, 0)
 wall_up = Wall(room_length, 0)
 wall_down = Wall(0, 0)
 
-p_list, circle_list = create_people(
-    40, room_width, room_length, wall_right.get_pos(), percent_p_at_loss=0.6
-)
+# create people
 
 
-def init():
-    """
-    init() function serves to setup the plot for animating:
-        1. create the first frame to display
-    """
-    for c in circle_list:
-        ax.add_patch(c)
-    # add door representation
-    p_lower = (
-        wall_right.door_pos[0][0] - 0.1,
-        wall_right.door_pos[0][1],
-    )  # door thickness = 10cm
-    rectangle = plt.Rectangle(p_lower, 0.1, wall_right.door_width)
-    ax.add_patch(rectangle)
-    return circle_list
+def initialize():
+    global p_list, time_to_escape, timer
+    p_i_range = (0.9, 1)
+    Rv_range = (
+        3,
+        4,
+    )  # this means everyone knows where is the exit and do not follow others.
+
+    p_list, _ = create_people(
+        40, room_width, room_length, wall_right.get_pos(), p_i_range, Rv_range
+    )
+
+    time_to_escape = []
+    timer = 0.0
 
 
-time_to_escape = []
-timer = 0.0
-
-
-def animate(i):
+def update_observe(dt):
     """
     the task of animate function is to:
         1. create a new frame
         2. if blit = True, need to return the artists that are changed
     """
-    global timer
+    global p_list, time_to_escape, timer
     Fi_list = []
     for p in p_list:
         # compute forces
@@ -142,7 +144,6 @@ def animate(i):
 
         Fi_list.append(Fi)
 
-    dt = 0.01 * 0.95
     timer += dt
     for Fi, p in zip(Fi_list, p_list):
         p.determine_ei(p_list, wall_right.get_pos(), room_width, room_length)
@@ -152,14 +153,17 @@ def animate(i):
             print("escapist succeed!")
             print("# of people remains:", len(p_list))
             time_to_escape.append(timer)
-    return circle_list
+    return
 
 
-# Setting blit=True ensures that only the portions of the image which have changed are updated.
-# init() and animate() returns (patch, ) , this tells the animation function which artists are changing.
-anim = animation.FuncAnimation(
-    fig, animate, init_func=init, frames=100000, interval=1, blit=True
-)
-plt.show()
+total_sim_time = 30 * 60  # in seconds
+dt = 0.01 * 0.95  # in seconds
+initialize()
+while timer <= total_sim_time:
+    update_observe(dt)
+    print("current time = {} seconds".format(timer))
+    if len(p_list) == 0:
+        break
+
 print(time_to_escape)
 print("mean time = ", np.mean(time_to_escape))

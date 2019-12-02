@@ -99,8 +99,8 @@ wall_down = Wall(0, 0)
 
 p_i_range = (0.9, 1)
 Rv_range = (
-    100,
-    101,
+    3,
+    5,
 )  # this means everyone knows where is the exit and do not follow others.
 p_list, circle_list = create_people(
     40, room_width, room_length, wall_right.get_pos(), p_i_range, Rv_range

@@ -35,17 +35,12 @@ class People:
         self.vec_r = vec_r
         self.vec_v = vec_v
         self.r_i = r_i
-        self.vec_ei=vec_ei
         self.m = self.SD * (
             np.pi * r_i ** 2
-        )  # here self.SD access to a class attribute
-        # self.thickness = 1
-        # the following 2 attributes are for visualizing
-        # default circle styles
-        # self.styles = {"edgecolor": "b", "fill": True}
-        # self.colour = (0, 0, 0)
-        # create a circle representation of itself
-        # self.circle=pygame.draw.circle(screen, self.colour, (np.int(self.vec_r[0]),np.int(self.vec_r[1])), np.int(self.r_i*100), self.thickness)
+        )  
+        rand_ei=vec_ei-[0.5,0.5]
+        self.vec_ei = rand_ei/sci.linalg.norm(rand_ei)
+      
 
 
     # define a class attribute
@@ -62,6 +57,9 @@ class People:
         """
         dt is the time step in seconds
         """
+        if sci.linalg.norm(vec_Fi)>5000: #make a threshold for over large force
+            vec_Fi=vec_Fi/sci.linalg.norm(vec_Fi)*5000
+
         y0 = np.array([self.vec_v[0], self.vec_v[1], self.vec_r[0], self.vec_r[1]])
         time_span = np.array([0, dt])
         solution = sci.integrate.odeint(
@@ -71,8 +69,7 @@ class People:
         # update states
         self.vec_v = solution[1, 0:2]
         self.vec_r = solution[1, 2:4]
-        # update its circle representation
-        # self.circle.center = (self.vec_r[0], self.vec_r[1])
+
 
     def _F_from_self(self, vec_ei):
         """
@@ -93,7 +90,6 @@ class People:
         vec_n_ij = (self.vec_r - other.vec_r) / d_ij
         vec_t_ij = np.array([-vec_n_ij[1], vec_n_ij[0]])
         delta_v_ji = np.dot(other.vec_v - self.vec_v, vec_t_ij)
-
         vec_F_ij = (
             self.A * np.exp((r_ij - d_ij) / self.B) + self.k * People.g(r_ij - d_ij)
         ) * vec_n_ij + self.kappa * People.g(r_ij - d_ij) * delta_v_ji * vec_t_ij
@@ -103,12 +99,15 @@ class People:
         """
         Compute force from wall
         """
-
-        d_iW = sci.linalg.norm(wall.b - self.vec_r[0])  # this computes the distance
-        vec_n_iW = (self.vec_r - np.array([wall.b, self.vec_r[1]])) / d_iW
-        vec_t_iW = np.array([-vec_n_iW[1], vec_n_iW[0]])
-
-        vec_F_iW = (
+        vec_F_iW=[0,0]
+        for w in wall:
+            x1,y1,x2,y2=w[0][0],w[0][1],w[1][0],w[1][1]
+            # use cross time computes distance to the wall
+            d_iW=sci.linalg.norm(np.cross([x2-x1,y2-y1], [x1-self.vec_r[0],y1-self.vec_r[1]]))/sci.linalg.norm([x2-x1,y2-y1])
+            vwall=[x2-x1,y2-y1]
+            vec_n_iW = (vwall-self.vec_r)/sci.linalg.norm(vwall-self.vec_r)
+            vec_t_iW = np.array([-vec_n_iW[1], vec_n_iW[0]])
+            vec_F_iW += (
             (
                 self.A * np.exp((self.r_i - d_iW) / self.B)
                 + self.k * People.g(self.r_i - d_iW)
@@ -118,25 +117,49 @@ class People:
             * People.g(self.r_i - d_iW)
             * np.dot(self.vec_v, vec_t_iW)
             * vec_t_iW
-        )
+            )
 
         return vec_F_iW
 
-    # def draw(self):
-        # """return its current circle representation"""
-        # return self.circle
     
     def draw(self,screen):
         self.thickness = 1
         self.colour = (0, 0, 0)
-        dpi=20 # set resolution
+        dpi=60 # set resolution
         pygame.draw.circle(screen, self.colour, (np.int(self.vec_r[0]*dpi),np.int(self.vec_r[1]*dpi)), np.int(self.r_i*dpi), self.thickness)
     
     def overlap(self,other):
         r_ij = self.r_i + other.r_i
         d_ij = sci.linalg.norm(self.vec_r - other.vec_r)
         if d_ij<r_ij:
-            return False
-        return True
+            return True
+        return False
 
-    # def direction(self,other):
+
+
+class Room:
+    """
+    the class for Room 
+    """
+
+    def __init__(self, room_length,room_width,layout):
+        """
+        
+        """
+        self.room_length=room_length
+        self.room_width=room_width
+        self.door_middle_point = np.array([10,5])
+        if layout== 'rec':
+            p0=(0,0)
+            p1=(0,room_width)
+            p2=(room_length,room_width)
+            p3=(room_length,room_width/2+1)
+            p4=(room_length,room_width/2-1)
+            p5=(room_length,0)  
+            self.wall=[p0,p1],[p2,p1],[p3,p2],[p4,p5],[p0,p5]
+
+    def draw(self,screen):
+        dpi=60
+        for w in self.wall: 
+            lines=np.multiply(w,60)
+            pygame.draw.lines(screen,(0, 0, 0),0,lines,20) 

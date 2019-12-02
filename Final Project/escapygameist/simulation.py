@@ -2,40 +2,39 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import animation
 from people import People
-from wall import Wall
+from people import Room
 import scipy as sci
 import pygame
 
 def ini():
     # create a bunch of particles
-    num_people = 10
+    num_people = 40
     vec_v = np.array([0, 0])
-    rand_ei=np.random.rand(2)-[0.5,0.5]
-    vec_ei = rand_ei/sci.linalg.norm(rand_ei)
     r = 0.25  # in meters
     #random initial position and check overlap
-    flag= True 
-    while flag:
-        p_list = [People(np.random.rand(2) * 10, vec_v, r,vec_ei,screen) for i in range(num_people)]
-        flag=False
-        for p in p_list:
-            for p_j in p_list:
-                if p_j is not p:
-                    if not p.overlap(p_j):
-                        flag=True
-                        break
+    overlap= False 
+    p_list=[]
+    while len(p_list)<num_people:
+        P=People(np.random.rand(2) * 10, vec_v, r,np.random.rand(2),screen)
+        for p_j in p_list:
+            if p_j.overlap(P):
+                overlap= True 
+                break
+            overlap= False 
+        if overlap== False:
+            p_list.append(P)
     return p_list
 
+def evacuate():
+    for p in p_list:
+        if sci.linalg.norm(p.vec_r-room.door_middle_point)<1:
+           p_list.remove(p) 
+
 def animate(i,screen):
-    """
-    the task of animate function is to:
-        1. create a new frame
-        2. if blit = True, need to return the artists that are changed
-    """
     F_list=[]
-    dt = 0.005
+    dt = 0.008
     panic=0.8
-    R=1  #virtual range
+    R=5 #virtual range
     for p in p_list:
         # compute forces
                 
@@ -51,20 +50,21 @@ def animate(i,screen):
                     count+=1
         
         # compute forces from within
-        rand_ei=np.random.rand(2)-[0.5,0.5]
-        p.vec_ei=rand_ei/sci.linalg.norm(rand_ei)
         if not count==0:
             x_ei=(1-panic)*p.vec_ei+panic*ei_from_others/count
             p.vec_ei=x_ei/sci.linalg.norm(x_ei)
-        if sci.linalg.norm(wall.door_middle_point - p.vec_r)<R:
-            p.vec_ei = (wall.door_middle_point - p.vec_r) / sci.linalg.norm(
-                wall.door_middle_point - p.vec_r
+        if sci.linalg.norm(room.door_middle_point - p.vec_r)<R:
+            p.vec_ei = (room.door_middle_point - p.vec_r) / sci.linalg.norm(
+                room.door_middle_point - p.vec_r
                 )  # desired direction to middle of the door position
+        p.vec_ei = (room.door_middle_point - p.vec_r) / sci.linalg.norm(
+                room.door_middle_point - p.vec_r
+                ) 
         F_from_self = p._F_from_self(p.vec_ei)  # F from self
 
         
         # compute forces from wall
-        F_from_wall = p.F_from_wall(wall)
+        F_from_wall = p.F_from_wall(room.wall)
 
         Fi = F_from_self + F_from_others + F_from_wall
         F_list.append(Fi)
@@ -72,6 +72,12 @@ def animate(i,screen):
     for i, p in enumerate(p_list):
         p.move(F_list[i], dt)
         p.draw(screen)
+
+# create the room
+room_length,room_width=10,10
+room=Room(room_length,room_width,'rec')
+
+# norm(np.cross(p2-p1, p1-p3))/norm(p2-p1)
 
 #create screen
 background_colour = (255,255,255)
@@ -82,11 +88,6 @@ pygame.display.set_caption('Escape Panic')
 #initalization
 p_list=ini()
 
-# create a wall
-b = 12
-wall_width = 2  # in meters
-wall = Wall(b, wall_width)
-
 i=0
 running = True
 while running:
@@ -95,6 +96,7 @@ while running:
             running = False
     i+=1
     screen.fill(background_colour)
+    evacuate()
     animate(i,screen)
-    # pygame.draw.lines(screen,(0, 0, 0),0,[(550,310),(550,590),(5,590),(5,5),(550,5),(550,290)],10)
+    room.draw(screen)
     pygame.display.flip()

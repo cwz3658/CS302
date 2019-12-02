@@ -156,7 +156,7 @@ def animate(i):
 
         Fi_list.append(Fi)
 
-    dt = 0.01 * 0.95
+    dt = 0.03 * 0.95
     timer += dt
     for Fi, p in zip(Fi_list, p_list):
         p.determine_ei(p_list, wall_right.get_pos(), room_width, room_length)

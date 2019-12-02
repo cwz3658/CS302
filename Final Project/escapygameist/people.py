@@ -104,9 +104,9 @@ class People:
             x1,y1,x2,y2=w[0][0],w[0][1],w[1][0],w[1][1]
             # use cross time computes distance to the wall
             d_iW=sci.linalg.norm(np.cross([x2-x1,y2-y1], [x1-self.vec_r[0],y1-self.vec_r[1]]))/sci.linalg.norm([x2-x1,y2-y1])
-            vwall=[x2-x1,y2-y1]
-            vec_n_iW = (vwall-self.vec_r)/sci.linalg.norm(vwall-self.vec_r)
-            vec_t_iW = np.array([-vec_n_iW[1], vec_n_iW[0]])
+            #vwall=[x2-x1,y2-y1]
+            vec_t_iW = (self.vec_r)/sci.linalg.norm(self.vec_r)
+            vec_n_iW = np.array([-vec_t_iW[1], vec_t_iW[0]])
             vec_F_iW += (
             (
                 self.A * np.exp((self.r_i - d_iW) / self.B)

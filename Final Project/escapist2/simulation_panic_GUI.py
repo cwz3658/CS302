@@ -90,7 +90,7 @@ def create_people(
 
 
 # create a wall
-b = 19
+b = 18.5
 door_width = 2  # in meters
 wall_right = Wall(b, door_width)
 wall_left = Wall(0, 0)
@@ -98,7 +98,10 @@ wall_up = Wall(room_length, 0)
 wall_down = Wall(0, 0)
 
 p_i_range = (0.9, 1)
-Rv_range = (3, 4)
+Rv_range = (
+    100,
+    101,
+)  # this means everyone knows where is the exit and do not follow others.
 p_list, circle_list = create_people(
     40, room_width, room_length, wall_right.get_pos(), p_i_range, Rv_range
 )
@@ -123,6 +126,21 @@ def init():
 
 time_to_escape = []
 timer = 0.0
+
+
+def find_nearest(people_list, door_pos, thresh_hold=0.499):
+    """
+    door_pos is an np array
+    returns None if no one is around door 0.7m
+    """
+    p_nearest = None
+    p_dist = 100
+    for p in people_list:
+        d = p.dist_to_door(door_pos)
+        if d < p_dist and d < thresh_hold:
+            p_nearest = p
+            p_dist = d
+    return p_nearest
 
 
 def animate(i):
@@ -160,9 +178,11 @@ def animate(i):
         p.move(Fi, dt, room_width, room_length)  # need modify
         if p.reach_door(wall_right.get_pos()):
             p_list.remove(p)
+            circle_list.remove(p.draw())
             print("escapist succeed!")
             print("# of people remains:", len(p_list))
             time_to_escape.append(timer)
+
     return circle_list
 
 

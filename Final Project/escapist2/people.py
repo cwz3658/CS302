@@ -21,7 +21,7 @@ class People:
     k = 1.2e5
     kappa = 2.4e5
     tau = 0.5  # characteristic time
-    v_des = 3.5  # desired speed
+    v_des = 4  # desired speed
 
     g = lambda x: np.max(
         [0, x]
@@ -83,6 +83,10 @@ class People:
         #    keep the vec_v within range! therefore shit does not happen
         if norm(new_vec_v) > self.v_des:
             new_vec_v = new_vec_v / norm(new_vec_v) * self.v_des
+
+        # if norm(new_vec_v - self.vec_v) > 0.08:
+        #     a = (new_vec_v - self.vec_v) / norm(new_vec_v - self.vec_v)
+        #     new_vec_v = self.vec_v + a * dt
 
         if 0 < new_vec_r[0] < room_width and 0 < new_vec_r[1] < room_length:
             self.vec_v = new_vec_v
@@ -178,7 +182,10 @@ class People:
         returns true if reach door
         """
         dist_to_door = norm(door_pos - self.vec_r)
-        return dist_to_door <= 1
+        return dist_to_door <= self.r_i + 0.2
+
+    def dist_to_door(self, door_pos):
+        return norm(door_pos - self.vec_r)
 
     def look_around(self, all_people_list):
         """

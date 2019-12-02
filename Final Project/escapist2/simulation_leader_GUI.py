@@ -90,7 +90,7 @@ def create_people(
 
 
 # create a wall
-b = 19
+b = 18.5
 door_width = 2  # in meters
 wall_right = Wall(b, door_width)
 wall_left = Wall(0, 0)
@@ -128,6 +128,24 @@ time_to_escape = []
 timer = 0.0
 
 
+def find_nearest(people_list, door_pos, thresh_hold=0.62):
+    """
+    door_pos is an np array
+    returns None if no one is around door 0.7m
+    """
+    p_nearest = None
+    p_dist = 100
+    num_people_near_door = 0
+    for p in people_list:
+        d = p.dist_to_door(door_pos)
+        if d < thresh_hold:
+            num_people_near_door += 1
+        if d < p_dist and d < thresh_hold:
+            p_nearest = p
+            p_dist = d
+    return p_nearest, num_people_near_door
+
+
 def animate(i):
     """
     the task of animate function is to:
@@ -156,16 +174,26 @@ def animate(i):
 
         Fi_list.append(Fi)
 
-    dt = 0.03 * 0.95
+    dt = 0.01 * 0.95
     timer += dt
     for Fi, p in zip(Fi_list, p_list):
         p.determine_ei(p_list, wall_right.get_pos(), room_width, room_length)
         p.move(Fi, dt, room_width, room_length)  # need modify
         if p.reach_door(wall_right.get_pos()):
             p_list.remove(p)
+            circle_list.remove(p.draw())
             print("escapist succeed!")
             print("# of people remains:", len(p_list))
             time_to_escape.append(timer)
+    # avoid clogging
+    p_nearest, num_p_near_door = find_nearest(p_list, wall_right.get_pos())
+    if p_nearest is not None and num_p_near_door >= 1:
+        p_list.remove(p_nearest)
+        circle_list.remove(p_nearest.draw())
+        print("escapist succeed!")
+        print("# of people remains:", len(p_list))
+        time_to_escape.append(timer)
+
     return circle_list
 
 
@@ -177,3 +205,5 @@ anim = animation.FuncAnimation(
 plt.show()
 print(time_to_escape)
 print("mean time = ", np.mean(time_to_escape))
+anim.save("with_leader.gif", writer="imagemagick", fps=60)
+

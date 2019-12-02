@@ -99,17 +99,16 @@ wall_down = Wall(0, 0)
 
 # create people
 
+num_people = 50
+
 
 def initialize():
     global p_list, time_to_escape, timer
     p_i_range = (0.9, 1)
-    Rv_range = (
-        3,
-        4,
-    )  # this means everyone knows where is the exit and do not follow others.
+    Rv_range = (3, 4)  # this means the vision range of people is limited
 
     p_list, _ = create_people(
-        40, room_width, room_length, wall_right.get_pos(), p_i_range, Rv_range
+        num_people, room_width, room_length, wall_right.get_pos(), p_i_range, Rv_range
     )
 
     time_to_escape = []
@@ -150,20 +149,20 @@ def update_observe(dt):
         p.move(Fi, dt, room_width, room_length)  # need modify
         if p.reach_door(wall_right.get_pos()):
             p_list.remove(p)
-            print("escapist succeed!")
+            print("escapist succeed! at time {} seconds".format(timer))
             print("# of people remains:", len(p_list))
             time_to_escape.append(timer)
     return
 
 
-total_sim_time = 30 * 60  # in seconds
+total_sim_time = 60  # in seconds
 dt = 0.01 * 0.95  # in seconds
 initialize()
 while timer <= total_sim_time:
     update_observe(dt)
-    print("current time = {} seconds".format(timer))
     if len(p_list) == 0:
         break
 
 print(time_to_escape)
 print("mean time = ", np.mean(time_to_escape))
+print("std time = ", np.std(time_to_escape))

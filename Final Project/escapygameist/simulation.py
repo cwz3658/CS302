@@ -50,16 +50,16 @@ def animate(i,screen):
                     count+=1
         
         # compute forces from within
-        if not count==0:
-            x_ei=(1-panic)*p.vec_ei+panic*ei_from_others/count
-            p.vec_ei=x_ei/sci.linalg.norm(x_ei)
-        if sci.linalg.norm(room.door_middle_point - p.vec_r)<R:
-            p.vec_ei = (room.door_middle_point - p.vec_r) / sci.linalg.norm(
-                room.door_middle_point - p.vec_r
-                )  # desired direction to middle of the door position
-        p.vec_ei = (room.door_middle_point - p.vec_r) / sci.linalg.norm(
-                room.door_middle_point - p.vec_r
-                ) 
+        # if not count==0:
+        #     x_ei=(1-panic)*p.vec_ei+panic*ei_from_others/count
+        #     p.vec_ei=x_ei/sci.linalg.norm(x_ei)
+        # if sci.linalg.norm(room.door_middle_point - p.vec_r)<R:
+        #     p.vec_ei = (room.door_middle_point - p.vec_r) / sci.linalg.norm(
+        #         room.door_middle_point - p.vec_r
+        #         )  # desired direction to middle of the door position
+        # p.vec_ei = (room.door_middle_point - p.vec_r) / sci.linalg.norm(
+        #         room.door_middle_point - p.vec_r
+        #         ) 
         F_from_self = p._F_from_self(p.vec_ei)  # F from self
 
         

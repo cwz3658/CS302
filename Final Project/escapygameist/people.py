@@ -57,9 +57,11 @@ class People:
         """
         dt is the time step in seconds
         """
-        if sci.linalg.norm(vec_Fi)>5000: #make a threshold for over large force
-            vec_Fi=vec_Fi/sci.linalg.norm(vec_Fi)*5000
-
+        # # #set force limit
+        # limit=np.sqrt(2)*self.m
+        # if sci.linalg.norm(vec_Fi)>limit:
+        #     vec_Fi=vec_Fi*limit/sci.linalg.norm(vec_Fi)
+        # # print(sci.linalg.norm(vec_Fi))
         y0 = np.array([self.vec_v[0], self.vec_v[1], self.vec_r[0], self.vec_r[1]])
         time_span = np.array([0, dt])
         solution = sci.integrate.odeint(
@@ -76,7 +78,10 @@ class People:
         Compute the force from v_des
         vec_ei: desired direction
         """
-        vec_F_des = self.m * (self.v_des * vec_ei - self.vec_v) / self.tau
+        velocity_var=self.v_des * vec_ei - self.vec_v
+        # if sci.linalg.norm(velocity_var)>0.5:
+        #     velocity_var=velocity_var*0.5/sci.linalg.norm(velocity_var)
+        vec_F_des = self.m * (velocity_var) / self.tau
         return vec_F_des
 
     def F_from_other(self, other):
@@ -102,11 +107,11 @@ class People:
         vec_F_iW=[0,0]
         for w in wall:
             x1,y1,x2,y2=w[0][0],w[0][1],w[1][0],w[1][1]
-            # use cross time computes distance to the wall
+            # using cross product to compute distance to the wall
             d_iW=sci.linalg.norm(np.cross([x2-x1,y2-y1], [x1-self.vec_r[0],y1-self.vec_r[1]]))/sci.linalg.norm([x2-x1,y2-y1])
-            #vwall=[x2-x1,y2-y1]
-            vec_t_iW = (self.vec_r)/sci.linalg.norm(self.vec_r)
-            vec_n_iW = np.array([-vec_t_iW[1], vec_t_iW[0]])
+            vwall=[x2-x1,y2-y1]
+            vec_n_iW = (self.vec_r-vwall)/sci.linalg.norm(self.vec_r-vwall)
+            vec_t_iW = np.array([-vec_n_iW[1], vec_n_iW[0]])
             vec_F_iW += (
             (
                 self.A * np.exp((self.r_i - d_iW) / self.B)

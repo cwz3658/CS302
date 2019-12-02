@@ -103,7 +103,7 @@ Rv_range = (
     101,
 )  # this means everyone knows where is the exit and do not follow others.
 p_list, circle_list = create_people(
-    40, room_width, room_length, wall_right.get_pos(), p_i_range, Rv_range
+    100, room_width, room_length, wall_right.get_pos(), p_i_range, Rv_range
 )
 
 
@@ -128,7 +128,7 @@ time_to_escape = []
 timer = 0.0
 
 
-def find_nearest(people_list, door_pos, thresh_hold=0.62):
+def find_nearest(people_list, door_pos, thresh_hold=1):
     """
     door_pos is an np array
     returns None if no one is around door 0.7m
